@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AUTOLOOP — Marketplace pièces auto</title>
+<link rel="stylesheet" href="style.css">
+<style>
+@media(max-width:850px){
+.topbar{height:auto;min-height:70px;flex-wrap:wrap;padding:12px 5%;gap:12px}
+.topbar nav.mobile-nav{display:flex;order:3;width:100%;overflow-x:auto;gap:10px;padding-bottom:4px}
+.topbar nav.mobile-nav a{background:#f0f1f3;border-radius:9px;padding:9px 12px;white-space:nowrap;font-weight:800;color:#30353b}
+.hero-actions{margin:20px 0;flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+<a class="logo" href="#" onclick="show('home')">AUTO<span>LOOP</span></a>
+<nav class="mobile-nav"><a href="#" onclick="show('catalogue');return false">Catalogue</a><a href="#" onclick="show('sell');return false">Devenir vendeur</a><a href="#" onclick="show('dashboard');return false">Espace vendeur</a></nav>
+<button class="cart" onclick="show('cart')">Panier <b id="cartCount">0</b></button>
+</header>
+<main id="app"></main>
+<footer>AUTOLOOP — MVP 0.3</footer>
+<script src="app.js"></script>
+</body></html>
