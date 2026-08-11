@@ -1,66 +1,69 @@
-const KEY = "autoloop_v04";
+const KEY = "autoloop_v05";
+
+const cars = {
+  Renault: {
+    Mégane: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"],
+    Clio: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"],
+    Captur: ["2019", "2020", "2021", "2022", "2023", "2024"]
+  },
+  Peugeot: {
+    208: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"],
+    308: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"],
+    3008: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"]
+  },
+  Citroën: {
+    C3: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"],
+    C4: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"]
+  },
+  Volkswagen: {
+    Golf: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"],
+    Polo: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"]
+  },
+  BMW: {
+    Serie1: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"],
+    Serie3: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"]
+  },
+  Mercedes: {
+    ClasseA: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"],
+    ClasseC: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"]
+  },
+  Audi: {
+    A3: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"],
+    A4: ["2018", "2019", "2020", "2021", "2022", "2023", "2024"]
+  }
+};
 
 const seed = [
   {
     id: 1,
     name: "Kit plaquettes de frein avant",
     brand: "Brembo",
-    vehicle: "Renault Mégane III 1.5 dCi",
+    vehicle: "Renault Mégane 2018",
+    engine: "1.5 dCi 110",
     price: 69.90,
     stock: 8,
-    seller: "AutoParts Pro"
+    seller: "AutoParts Pro",
+    image: ""
   },
   {
     id: 2,
     name: "Filtre à huile",
     brand: "Bosch",
-    vehicle: "Peugeot 308 1.6 HDi",
+    vehicle: "Peugeot 308 2020",
+    engine: "1.6 HDi",
     price: 12.50,
     stock: 24,
-    seller: "Pièces Express"
-  },
-  {
-    id: 3,
-    name: "Kit distribution + pompe à eau",
-    brand: "SKF",
-    vehicle: "Renault Clio IV 1.5 dCi",
-    price: 139.90,
-    stock: 4,
-    seller: "AutoParts Pro"
+    seller: "Pièces Express",
+    image: ""
   }
 ];
-
-const cars = {
-  Renault: {
-    Mégane: ["2018", "2019", "2020", "2021", "2022"],
-    Clio: ["2018", "2019", "2020", "2021", "2022"],
-    Captur: ["2019", "2020", "2021", "2022"]
-  },
-  Peugeot: {
-    308: ["2018", "2019", "2020", "2021", "2022"],
-    208: ["2018", "2019", "2020", "2021", "2022"],
-    3008: ["2018", "2019", "2020", "2021", "2022"]
-  },
-  Citroën: {
-    C3: ["2018", "2019", "2020", "2021", "2022"],
-    C4: ["2018", "2019", "2020", "2021", "2022"]
-  },
-  Volkswagen: {
-    Golf: ["2018", "2019", "2020", "2021", "2022"],
-    Polo: ["2018", "2019", "2020", "2021", "2022"]
-  },
-  BMW: {
-    Serie3: ["2018", "2019", "2020", "2021", "2022"],
-    Serie1: ["2018", "2019", "2020", "2021", "2022"]
-  }
-};
 
 let db = JSON.parse(localStorage.getItem(KEY) || "null") || {
   products: seed,
   cart: [],
   orders: [],
-  seller: null,
   accounts: [],
+  seller: null,
   pendingVerification: null
 };
 
@@ -69,37 +72,22 @@ function save() {
   updateCart();
 }
 
-function money(number) {
-  return number.toLocaleString("fr-FR", {
+function money(value) {
+  return Number(value).toLocaleString("fr-FR", {
     style: "currency",
     currency: "EUR"
   });
 }
 
 function updateCart() {
-  const cart = document.querySelector("#cartCount");
+  const el = document.querySelector("#cartCount");
 
-  if (cart) {
-    cart.textContent = db.cart.reduce(
-      (total, item) => total + item.qty,
+  if (el) {
+    el.textContent = db.cart.reduce(
+      (sum, item) => sum + item.qty,
       0
     );
   }
-}
-
-function show(page) {
-  const app = document.querySelector("#app");
-
-  if (page === "home") app.innerHTML = home();
-  if (page === "catalogue") app.innerHTML = catalogue();
-  if (page === "sell") app.innerHTML = sell();
-  if (page === "login") app.innerHTML = login();
-  if (page === "verify") app.innerHTML = verify();
-  if (page === "dashboard") app.innerHTML = dashboard();
-  if (page === "addproduct") app.innerHTML = addProduct();
-  if (page === "cart") app.innerHTML = cart();
-
-  updateCart();
 }
 
 function brandOptions() {
@@ -115,27 +103,29 @@ function modelOptions(brand) {
 }
 
 function yearOptions(brand, model) {
-  return (cars[brand]?.[model] || ["2020"])
+  return (cars[brand]?.[model] || ["2024"])
     .map(year => `<option>${year}</option>`)
     .join("");
-}function updateModels() {
-  const brand = document.querySelector("#carBrand");
-  const model = document.querySelector("#carModel");
-  const year = document.querySelector("#carYear");
-
-  if (!brand || !model || !year) return;
-
-  model.innerHTML = modelOptions(brand.value);
-  year.innerHTML = yearOptions(brand.value, model.value);
 }
 
-function updateYears() {
-  const brand = document.querySelector("#carBrand");
-  const model = document.querySelector("#carModel");
-  const year = document.querySelector("#carYear");
+function show(page) {
+  const app = document.querySelector("#app");
 
-  if (brand && model && year) {
-    year.innerHTML = yearOptions(brand.value, model.value);
+  if (!app) return;
+
+  if (page === "home") app.innerHTML = home();
+  if (page === "catalogue") app.innerHTML = catalogue();
+  if (page === "sell") app.innerHTML = sell();
+  if (page === "login") app.innerHTML = login();
+  if (page === "verify") app.innerHTML = verify();
+  if (page === "dashboard") app.innerHTML = dashboard();
+  if (page === "addproduct") app.innerHTML = addProduct();
+  if (page === "cart") app.innerHTML = cart();
+
+  updateCart();
+
+  if (page === "addproduct") {
+    preparePhotoInput();
   }
 }
 
@@ -143,73 +133,53 @@ function home() {
   return `
     <section class="wrap hero">
 
-      <div>
-        <p class="eyebrow">MARKETPLACE AUTO</p>
+      <p class="eyebrow">MARKETPLACE AUTO</p>
 
-        <h1>
-          La bonne pièce.<br>
-          <span>Pour la bonne voiture.</span>
-        </h1>
+      <h1>
+        La bonne pièce.<br>
+        <span>Pour la bonne voiture.</span>
+      </h1>
 
-        <p class="lead">
-          Pièces détachées automobiles neuves vendues
-          par des professionnels.
-        </p>
+      <p class="lead">
+        Pièces automobiles neuves vendues
+        par des professionnels.
+      </p>
 
-        <div class="finder">
+      <div class="finder">
 
-          <select id="carBrand" onchange="updateModels()">
-            ${brandOptions()}
-          </select>
+        <select id="carBrand" onchange="updateModels()">
+          ${brandOptions()}
+        </select>
 
-          <select id="carModel" onchange="updateYears()">
-            ${modelOptions("Renault")}
-          </select>
+        <select id="carModel" onchange="updateYears()">
+          ${modelOptions("Renault")}
+        </select>
 
-          <select id="carYear">
-            ${yearOptions("Renault", "Mégane")}
-          </select>
+        <select id="carYear">
+          ${yearOptions("Renault", "Mégane")}
+        </select>
 
-          <button
-            class="btn primary"
-            onclick="show('catalogue')">
-            Rechercher
-          </button>
+        <button
+          class="btn primary"
+          onclick="show('catalogue')">
+          Rechercher
+        </button>
 
-        </div>
-
-        <div class="hero-actions">
-
-          <button
-            class="btn dark"
-            onclick="show('sell')">
-            Devenir vendeur
-          </button>
-
-          <button
-            class="btn"
-            onclick="show('catalogue')">
-            Voir le catalogue
-          </button>
-
-        </div>
       </div>
 
-      <div class="hero-card">
+      <div class="hero-actions">
 
-        <span class="eyebrow">
-          AUTOLOOP 0.4
-        </span>
+        <button
+          class="btn dark"
+          onclick="show('sell')">
+          Devenir vendeur
+        </button>
 
-        <strong>
-          La bonne pièce pour le bon véhicule.
-        </strong>
-
-        <p class="muted">
-          Recherche par marque, modèle et année.
-          Les vendeurs pourront également publier
-          leurs propres pièces.
-        </p>
+        <button
+          class="btn"
+          onclick="show('catalogue')">
+          Voir le catalogue
+        </button>
 
       </div>
 
@@ -217,22 +187,44 @@ function home() {
   `;
 }
 
-function catalogue() {
+function updateModels() {
+  const brand = document.querySelector("#carBrand");
+  const model = document.querySelector("#carModel");
+  const year = document.querySelector("#carYear");
 
+  if (!brand || !model || !year) return;
+
+  model.innerHTML = modelOptions(brand.value);
+  year.innerHTML = yearOptions(
+    brand.value,
+    model.value
+  );
+}
+
+function updateYears() {
+  const brand = document.querySelector("#carBrand");
+  const model = document.querySelector("#carModel");
+  const year = document.querySelector("#carYear");
+
+  if (!brand || !model || !year) return;
+
+  year.innerHTML = yearOptions(
+    brand.value,
+    model.value
+  );
+} function catalogue() {
   return `
     <section class="wrap">
 
+      <p class="eyebrow">CATALOGUE</p>
+
       <div class="section-title">
 
-        <div>
-          <p class="eyebrow">CATALOGUE</p>
-          <h2>Pièces disponibles</h2>
-        </div>
+        <h2>Pièces disponibles</h2>
 
         <input
           class="input"
-          style="max-width:280px"
-          placeholder="Rechercher une pièce..."
+          placeholder="Rechercher..."
           oninput="search(this.value)"
         >
 
@@ -253,82 +245,115 @@ function catalogue() {
 function productCards(list) {
 
   if (!list.length) {
-
     return `
       <div class="empty">
         Aucune pièce trouvée.
       </div>
     `;
-
   }
 
-  return list.map(product => `
+  return list.map(product => {
 
-    <article class="product">
+    const image = product.image
+      ? `
+        <img
+          src="${product.image}"
+          alt="${product.name}"
+          style="
+            width:100%;
+            height:220px;
+            object-fit:cover;
+            border-radius:16px 16px 0 0;
+          "
+        >
+      `
+      : `
+        <div class="pic">
+          PIÈCE AUTO
+        </div>
+      `;
 
-      <div class="pic">
-        PIÈCE AUTO
-      </div>
+    return `
+      <article class="product">
 
-      <div class="pbody">
+        ${image}
 
-        <div class="small">
-          ${product.brand} · ${product.seller}
+        <div class="pbody">
+
+          <div class="small">
+            ${product.brand}
+            ·
+            ${product.seller}
+          </div>
+
+          <h3>
+            ${product.name}
+          </h3>
+
+          <div class="small">
+            ${product.vehicle}
+          </div>
+
+          ${
+            product.engine
+            ?
+            `<div class="small">
+              ${product.engine}
+            </div>`
+            :
+            ""
+          }
+
+          <div class="price">
+            ${money(product.price)}
+          </div>
+
+          <div class="small">
+            Stock : ${product.stock}
+          </div>
+
+          <div class="row">
+
+            <button
+              class="btn primary"
+              style="flex:1"
+              onclick="add(${product.id})">
+              Ajouter
+            </button>
+
+            <button
+              class="btn dark"
+              onclick="details(${product.id})">
+              Voir
+            </button>
+
+          </div>
+
         </div>
 
-        <h3>
-          ${product.name}
-        </h3>
+      </article>
+    `;
 
-        <div class="small">
-          ${product.vehicle}
-        </div>
-
-        <div class="price">
-          ${money(product.price)}
-        </div>
-
-        <div class="small">
-          Stock : ${product.stock}
-        </div>
-
-        <div class="row">
-
-          <button
-            class="btn primary"
-            style="flex:1"
-            onclick="add(${product.id})">
-            Ajouter
-          </button>
-
-          <button
-            class="btn dark"
-            onclick="details(${product.id})">
-            Voir
-          </button>
-
-        </div>
-
-      </div>
-
-    </article>
-
-  `).join("");
+  }).join("");
 }
 
 function search(query) {
 
+  const text = query.toLowerCase();
+
   const products = db.products.filter(product => {
 
-    const text =
+    return (
       product.name +
+      " " +
       product.brand +
+      " " +
       product.vehicle +
-      product.seller;
-
-    return text
+      " " +
+      product.seller
+    )
       .toLowerCase()
-      .includes(query.toLowerCase());
+      .includes(text);
 
   });
 
@@ -341,12 +366,39 @@ function search(query) {
   }
 }
 
+function details(id) {
+
+  const product =
+    db.products.find(p => p.id === id);
+
+  if (!product) return;
+
+  alert(
+    product.name +
+    "\n\n" +
+    product.vehicle +
+    "\n" +
+    (product.engine || "") +
+    "\n\nVendeur : " +
+    product.seller +
+    "\n\nPrix : " +
+    money(product.price) +
+    "\n\nStock : " +
+    product.stock
+  );
+}
+
 function add(id) {
 
   const product =
-    db.products.find(product => product.id === id);
+    db.products.find(p => p.id === id);
 
   if (!product) return;
+
+  if (product.stock <= 0) {
+    alert("Cette pièce est en rupture de stock.");
+    return;
+  }
 
   const existing =
     db.cart.find(item => item.id === id);
@@ -362,39 +414,22 @@ function add(id) {
 
   save();
 
-  alert(
-    "Pièce ajoutée au panier."
-  );
+  alert("Pièce ajoutée au panier.");
 }
 
-function details(id) {
+function cart() {
 
-  const product =
-    db.products.find(product => product.id === id);
+  let total = 0;
 
-  if (!product) return;
-
-  alert(
-    product.name +
-    "\n\n" +
-    product.vehicle +
-    "\n\nVendeur : " +
-    product.seller +
-    "\n\nPrix : " +
-    money(product.price) +
-    "\n\nStock : " +
-    product.stock
-  );
-}function cart() {
-
-  let rows = db.cart.map(item => {
+  const rows = db.cart.map(item => {
 
     const product =
-      db.products.find(
-        product => product.id === item.id
-      );
+      db.products.find(p => p.id === item.id);
 
     if (!product) return "";
+
+    total +=
+      product.price * item.qty;
 
     return `
       <tr>
@@ -428,26 +463,7 @@ function details(id) {
 
   }).join("");
 
-  const total =
-    db.cart.reduce(
-      (total, item) => {
-
-        const product =
-          db.products.find(
-            product => product.id === item.id
-          );
-
-        if (!product) return total;
-
-        return total +
-          product.price * item.qty;
-
-      },
-      0
-    );
-
   return `
-
     <section class="wrap">
 
       <p class="eyebrow">
@@ -455,60 +471,57 @@ function details(id) {
       </p>
 
       <h2>
-        Votre panier
+        Panier
       </h2>
 
       ${
         rows
         ?
         `
-        <table class="table">
+          <table class="table">
 
-          <tr>
-            <th>Produit</th>
-            <th>Vendeur</th>
-            <th>Qté</th>
-            <th>Total</th>
-            <th></th>
-          </tr>
+            <tr>
+              <th>Produit</th>
+              <th>Vendeur</th>
+              <th>Qté</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
 
-          ${rows}
+            ${rows}
 
-        </table>
+          </table>
 
-        <div
-          style="
-          text-align:right;
-          margin-top:25px;
-          "
-        >
-
-          <div class="total">
-            ${money(total)}
-          </div>
-
-          <button
-            class="btn primary"
-            onclick="checkout()"
+          <div
+            style="
+              text-align:right;
+              margin-top:25px;
+            "
           >
-            Créer la commande
-          </button>
 
-        </div>
+            <div class="total">
+              ${money(total)}
+            </div>
+
+            <button
+              class="btn primary"
+              onclick="checkout()">
+              Créer la commande
+            </button>
+
+          </div>
         `
         :
         `
-        <div class="empty">
-          Votre panier est vide.
-        </div>
+          <div class="empty">
+            Votre panier est vide.
+          </div>
         `
       }
 
     </section>
-
   `;
 }
-
 
 function removeCart(id) {
 
@@ -522,57 +535,33 @@ function removeCart(id) {
   show("cart");
 }
 
-
 function checkout() {
 
   if (!db.cart.length) {
-
-    alert(
-      "Votre panier est vide."
-    );
-
+    alert("Votre panier est vide.");
     return;
   }
 
-  const total =
-    db.cart.reduce(
-      (sum, item) => {
+  let total = 0;
 
-        const product =
-          db.products.find(
-            product => product.id === item.id
-          );
+  db.cart.forEach(item => {
 
-        if (!product) return sum;
+    const product =
+      db.products.find(p => p.id === item.id);
 
-        return sum +
-          product.price * item.qty;
+    if (product) {
+      total +=
+        product.price * item.qty;
+    }
 
-      },
-      0
-    );
+  });
 
-  const order = {
-
-    id:
-      "AL-" +
-      Date.now()
-        .toString()
-        .slice(-6),
-
-    date:
-      new Date()
-        .toLocaleDateString("fr-FR"),
-
-    total:
-      total,
-
-    status:
-      "En préparation"
-
-  };
-
-  db.orders.push(order);
+  db.orders.push({
+    id: "AL-" + Date.now(),
+    date: new Date().toLocaleDateString("fr-FR"),
+    total: total,
+    status: "En préparation"
+  });
 
   db.cart = [];
 
@@ -580,17 +569,13 @@ function checkout() {
 
   alert(
     "Commande créée.\n\n" +
-    "Paiement encore simulé dans cette version."
+    "Paiement encore simulé."
   );
 
-  show("dashboard");
-}
-
-
-function sell() {
+  show("home");
+}function sell() {
 
   return `
-
     <section class="wrap">
 
       <div class="auth">
@@ -600,14 +585,18 @@ function sell() {
         </p>
 
         <h2>
-          Vendez sur AUTOLOOP
+          Devenir vendeur
         </h2>
 
         <div class="notice">
 
-          Pour le prototype, les codes
-          email et SMS sont simulés.
-          Aucun message réel n'est envoyé.
+          Création de compte avec
+          vérification email et téléphone.
+
+          <br><br>
+
+          Dans le prototype,
+          les codes sont affichés à l'écran.
 
         </div>
 
@@ -640,7 +629,7 @@ function sell() {
           >
 
           <label>
-            Numéro de téléphone
+            Téléphone
           </label>
 
           <input
@@ -659,9 +648,9 @@ function sell() {
             id="rpass"
             class="input"
             type="password"
-            minlength="6"
+            minlength="8"
             required
-            placeholder="6 caractères minimum"
+            placeholder="8 caractères minimum"
           >
 
           <label>
@@ -679,9 +668,8 @@ function sell() {
 
           <button
             class="btn primary"
-            type="submit"
-          >
-            Créer mon compte vendeur
+            type="submit">
+            Créer mon compte
           </button>
 
         </form>
@@ -691,27 +679,27 @@ function sell() {
 
           <span
             class="smalllink"
-            onclick="show('login')"
-          >
+            onclick="show('login')">
             Se connecter
           </span>
-
         </p>
 
       </div>
 
     </section>
-
   `;
 }
-
 
 async function register(event) {
 
   event.preventDefault();
 
   const email =
-    rEmailValue();
+    document
+      .querySelector("#remail")
+      .value
+      .trim()
+      .toLowerCase();
 
   const phone =
     document
@@ -719,13 +707,11 @@ async function register(event) {
       .value
       .trim();
 
-  const existing =
-    db.accounts.find(
-      account =>
-        account.email === email
-    );
-
-  if (existing) {
+  if (
+    db.accounts.some(
+      account => account.email === email
+    )
+  ) {
 
     alert(
       "Cette adresse email est déjà utilisée."
@@ -768,14 +754,9 @@ async function register(event) {
         .value
         .trim(),
 
-    email:
-      email,
+    email: email,
 
-    phone:
-      phone,
-
-    passHash:
-      passwordHash,
+    phone: phone,
 
     city:
       document
@@ -783,11 +764,12 @@ async function register(event) {
         .value
         .trim(),
 
-    emailVerified:
-      false,
+    passHash:
+      passwordHash,
 
-    phoneVerified:
-      false
+    emailVerified: false,
+
+    phoneVerified: false
 
   };
 
@@ -811,16 +793,7 @@ async function register(event) {
   show("verify");
 }
 
-
-function rEmailValue() {
-
-  return document
-    .querySelector("#remail")
-    .value
-    .trim()
-    .toLowerCase();
-
-}function verify() {
+function verify() {
 
   const pending =
     db.pendingVerification;
@@ -830,7 +803,6 @@ function rEmailValue() {
   }
 
   return `
-
     <section class="wrap">
 
       <div class="auth">
@@ -845,10 +817,18 @@ function rEmailValue() {
 
         <div class="notice">
 
-          Dans cette version prototype,
-          les codes sont affichés à l'écran.
-          Plus tard, ils seront envoyés
-          réellement par email et SMS.
+          Prototype :
+
+          <br>
+
+          les codes sont affichés
+          à l'écran.
+
+          <br><br>
+
+          Dans la vraie version,
+          ils seront envoyés par email
+          et SMS.
 
         </div>
 
@@ -875,7 +855,7 @@ function rEmailValue() {
           </p>
 
           <label>
-            Code reçu par email
+            Code email
           </label>
 
           <input
@@ -883,11 +863,11 @@ function rEmailValue() {
             class="input"
             inputmode="numeric"
             maxlength="6"
-            placeholder="123456"
+            required
           >
 
           <label>
-            Code reçu par SMS
+            Code téléphone
           </label>
 
           <input
@@ -895,15 +875,14 @@ function rEmailValue() {
             class="input"
             inputmode="numeric"
             maxlength="6"
-            placeholder="123456"
+            required
           >
 
           <br>
 
           <button
             class="btn primary"
-            onclick="completeVerification()"
-          >
+            onclick="completeVerification()">
             Vérifier mon compte
           </button>
 
@@ -912,10 +891,8 @@ function rEmailValue() {
       </div>
 
     </section>
-
   `;
 }
-
 
 function completeVerification() {
 
@@ -923,31 +900,29 @@ function completeVerification() {
     db.pendingVerification;
 
   if (!pending) {
-
     show("sell");
-
     return;
   }
 
-  const emailInput =
+  const email =
     document
       .querySelector("#emailCode")
       .value
       .trim();
 
-  const phoneInput =
+  const phone =
     document
       .querySelector("#phoneCode")
       .value
       .trim();
 
   if (
-    emailInput !== pending.emailCode ||
-    phoneInput !== pending.phoneCode
+    email !== pending.emailCode ||
+    phone !== pending.phoneCode
   ) {
 
     alert(
-      "Le code email ou téléphone est incorrect."
+      "Code email ou téléphone incorrect."
     );
 
     return;
@@ -960,11 +935,7 @@ function completeVerification() {
     );
 
   if (!account) {
-
-    alert(
-      "Compte introuvable."
-    );
-
+    alert("Compte introuvable.");
     return;
   }
 
@@ -986,11 +957,9 @@ function completeVerification() {
   show("dashboard");
 }
 
-
 function login() {
 
   return `
-
     <section class="wrap">
 
       <div class="auth">
@@ -1034,33 +1003,27 @@ function login() {
 
           <button
             class="btn primary"
-            type="submit"
-          >
+            type="submit">
             Se connecter
           </button>
 
         </form>
 
         <p>
-
           Pas encore de compte ?
 
           <span
             class="smalllink"
-            onclick="show('sell')"
-          >
+            onclick="show('sell')">
             Créer un compte
           </span>
-
         </p>
 
       </div>
 
     </section>
-
   `;
 }
-
 
 async function doLogin(event) {
 
@@ -1078,22 +1041,20 @@ async function doLogin(event) {
       .querySelector("#lpass")
       .value;
 
-  const passwordHash =
+  const hash =
     await hashPassword(password);
 
   const account =
     db.accounts.find(
       account =>
         account.email === email &&
-        account.passHash === passwordHash
+        account.passHash === hash
     );
 
   if (!account) {
-
     alert(
       "Email ou mot de passe incorrect."
     );
-
     return;
   }
 
@@ -1129,7 +1090,6 @@ async function doLogin(event) {
     );
 
   return `
-
     <section class="wrap">
 
       <div class="seller-head">
@@ -1167,9 +1127,8 @@ async function doLogin(event) {
         </div>
 
         <button
-          class="btn danger-btn"
-          onclick="logout()"
-        >
+          class="btn"
+          onclick="logout()">
           Déconnexion
         </button>
 
@@ -1193,8 +1152,7 @@ async function doLogin(event) {
 
           <button
             class="btn primary"
-            onclick="show('addproduct')"
-          >
+            onclick="show('addproduct')">
             + Ajouter une pièce
           </button>
 
@@ -1228,74 +1186,23 @@ async function doLogin(event) {
         mine.length
         ?
         `
-        <table class="table">
-
-          <tr>
-            <th>
-              Produit
-            </th>
-
-            <th>
-              Prix
-            </th>
-
-            <th>
-              Stock
-            </th>
-          </tr>
-
-          ${
-            mine.map(product => `
-
-              <tr>
-
-                <td>
-
-                  ${product.name}
-
-                  <br>
-
-                  <span class="small">
-                    ${product.vehicle}
-                  </span>
-
-                </td>
-
-                <td>
-                  ${money(product.price)}
-                </td>
-
-                <td>
-                  ${product.stock}
-                </td>
-
-              </tr>
-
-            `).join("")
-          }
-
-        </table>
+          <div class="grid">
+            ${productCards(mine)}
+          </div>
         `
         :
         `
-        <div class="empty">
-
-          Aucune pièce publiée.
-
-          <br><br>
-
-          Ajoute ta première pièce
-          pour commencer.
-
-        </div>
+          <div class="empty">
+            Aucune pièce publiée.
+            <br><br>
+            Ajoute ta première pièce.
+          </div>
         `
       }
 
     </section>
-
   `;
 }
-
 
 function addProduct() {
 
@@ -1304,7 +1211,6 @@ function addProduct() {
   }
 
   return `
-
     <section class="wrap">
 
       <div class="form">
@@ -1318,6 +1224,7 @@ function addProduct() {
         </h2>
 
         <form
+          id="productForm"
           class="card"
           onsubmit="publish(event)"
         >
@@ -1345,6 +1252,26 @@ function addProduct() {
           >
 
           <label>
+            Photo de la pièce
+          </label>
+
+          <input
+            id="productPhoto"
+            class="input"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            capture="environment"
+            required
+          >
+
+          <div
+            id="photoPreview"
+            style="
+              margin-top:15px;
+            "
+          ></div>
+
+          <label>
             Véhicule compatible
           </label>
 
@@ -1367,7 +1294,7 @@ function addProduct() {
             <select
               id="pCarYear"
             >
-              ${yearOptions("Renault","Mégane")}
+              ${yearOptions("Renault", "Mégane")}
             </select>
 
           </div>
@@ -1403,7 +1330,7 @@ function addProduct() {
             id="pstock"
             class="input"
             type="number"
-            min="0"
+            min="1"
             required
           >
 
@@ -1411,8 +1338,7 @@ function addProduct() {
 
           <button
             class="btn primary"
-            type="submit"
-          >
+            type="submit">
             Publier la pièce
           </button>
 
@@ -1421,21 +1347,94 @@ function addProduct() {
       </div>
 
     </section>
-
   `;
 }
 
+function preparePhotoInput() {
+
+  const input =
+    document.querySelector(
+      "#productPhoto"
+    );
+
+  const preview =
+    document.querySelector(
+      "#photoPreview"
+    );
+
+  if (!input || !preview) {
+    return;
+  }
+
+  input.addEventListener(
+    "change",
+    function () {
+
+      const file =
+        this.files[0];
+
+      if (!file) {
+        preview.innerHTML = "";
+        return;
+      }
+
+      if (
+        !file.type.startsWith("image/")
+      ) {
+
+        alert(
+          "Sélectionne une image."
+        );
+
+        this.value = "";
+        return;
+      }
+
+      const reader =
+        new FileReader();
+
+      reader.onload =
+        function (event) {
+
+          preview.innerHTML = `
+            <img
+              src="${event.target.result}"
+              alt="Photo de la pièce"
+              style="
+                width:100%;
+                max-width:450px;
+                max-height:300px;
+                object-fit:cover;
+                border-radius:16px;
+                display:block;
+              "
+            >
+          `;
+
+        };
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+}
 
 function updateProductModels() {
 
   const brand =
-    document.querySelector("#pCarBrand");
+    document.querySelector(
+      "#pCarBrand"
+    );
 
   const model =
-    document.querySelector("#pCarModel");
+    document.querySelector(
+      "#pCarModel"
+    );
 
   const year =
-    document.querySelector("#pCarYear");
+    document.querySelector(
+      "#pCarYear"
+    );
 
   if (!brand || !model || !year) {
     return;
@@ -1451,17 +1450,22 @@ function updateProductModels() {
     );
 }
 
-
 function updateProductYears() {
 
   const brand =
-    document.querySelector("#pCarBrand");
+    document.querySelector(
+      "#pCarBrand"
+    );
 
   const model =
-    document.querySelector("#pCarModel");
+    document.querySelector(
+      "#pCarModel"
+    );
 
   const year =
-    document.querySelector("#pCarYear");
+    document.querySelector(
+      "#pCarYear"
+    );
 
   if (!brand || !model || !year) {
     return;
@@ -1472,81 +1476,119 @@ function updateProductYears() {
       brand.value,
       model.value
     );
-}
-
-
-function publish(event) {
+}function publish(event) {
 
   event.preventDefault();
 
-  const brand =
-    document.querySelector("#pCarBrand").value;
+  const fileInput =
+    document.querySelector(
+      "#productPhoto"
+    );
 
-  const model =
-    document.querySelector("#pCarModel").value;
+  const file =
+    fileInput.files[0];
 
-  const year =
-    document.querySelector("#pCarYear").value;
+  if (!file) {
 
-  const engine =
-    document.querySelector("#pengine").value.trim();
+    alert(
+      "Ajoute une photo de la pièce."
+    );
 
-  const vehicle =
-    `${brand} ${model} ${year}` +
-    (engine ? ` · ${engine}` : "");
+    return;
+  }
 
-  const product = {
+  const reader =
+    new FileReader();
 
-    id: Date.now(),
+  reader.onload =
+    function () {
 
-    name:
-      document
-        .querySelector("#pname")
-        .value
-        .trim(),
+      const brand =
+        document.querySelector(
+          "#pCarBrand"
+        ).value;
 
-    brand:
-      document
-        .querySelector("#pbrand")
-        .value
-        .trim(),
+      const model =
+        document.querySelector(
+          "#pCarModel"
+        ).value;
 
-    vehicle:
+      const year =
+        document.querySelector(
+          "#pCarYear"
+        ).value;
 
-      vehicle,
+      const engine =
+        document.querySelector(
+          "#pengine"
+        ).value
+        .trim();
 
-    price:
+      const vehicle =
+        `${brand} ${model} ${year}` +
+        (
+          engine
+          ? ` · ${engine}`
+          : ""
+        );
 
-      Number(
-        document
-          .querySelector("#pprice")
-          .value
-      ),
+      const product = {
 
-    stock:
+        id: Date.now(),
 
-      Number(
-        document
-          .querySelector("#pstock")
-          .value
-      ),
+        name:
+          document
+            .querySelector("#pname")
+            .value
+            .trim(),
 
-    seller:
-      db.seller.name
+        brand:
+          document
+            .querySelector("#pbrand")
+            .value
+            .trim(),
 
-  };
+        vehicle:
+          vehicle,
 
-  db.products.unshift(product);
+        engine:
+          engine,
 
-  save();
+        price:
+          Number(
+            document
+              .querySelector("#pprice")
+              .value
+          ),
 
-  alert(
-    "Pièce publiée dans le catalogue AUTOLOOP."
-  );
+        stock:
+          Number(
+            document
+              .querySelector("#pstock")
+              .value
+          ),
 
-  show("dashboard");
+        seller:
+          db.seller.name,
+
+        image:
+          reader.result
+
+      };
+
+      db.products.unshift(product);
+
+      save();
+
+      alert(
+        "Pièce publiée dans AUTOLOOP !"
+      );
+
+      show("dashboard");
+    };
+
+  reader.readAsDataURL(file);
 }
-
 
 function logout() {
 
@@ -1557,16 +1599,28 @@ function logout() {
   show("home");
 }
 
+async function hashPassword(value) {
 
-show("home");async function hashPassword(value) {
-  const data = new TextEncoder().encode(value);
+  const data =
+    new TextEncoder()
+      .encode(value);
 
-  const buffer = await crypto.subtle.digest(
-    "SHA-256",
-    data
-  );
+  const buffer =
+    await crypto.subtle.digest(
+      "SHA-256",
+      data
+    );
 
-  return [...new Uint8Array(buffer)]
-    .map(byte => byte.toString(16).padStart(2, "0"))
+  return [
+    ...new Uint8Array(buffer)
+  ]
+    .map(
+      byte =>
+        byte
+          .toString(16)
+          .padStart(2, "0")
+    )
     .join("");
 }
+
+show("home");
