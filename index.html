@@ -1,24 +1,78 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AUTOLOOP — Marketplace pièces auto</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>AUTOLOOP — Marketplace pièces auto</title>
+
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
 <header class="topbar">
-  <a class="logo" href="#" onclick="show('home');return false">AUTO<span>LOOP</span></a>
+
+  <a
+    class="logo"
+    href="#"
+    onclick="show('home');return false"
+  >
+    AUTO<span>LOOP</span>
+  </a>
+
   <nav class="mobile-nav">
-    <a href="#" onclick="show('home');return false">Accueil</a>
-    <a href="#" onclick="show('catalogue');return false">Catalogue</a>
-    <a href="#" onclick="show('sell');return false">Devenir vendeur</a>
-    <a href="#" onclick="show('dashboard');return false">Espace vendeur</a>
+
+    <a
+      href="#"
+      onclick="show('home');return false"
+    >
+      Accueil
+    </a>
+
+    <a
+      href="#"
+      onclick="show('catalogue');return false"
+    >
+      Catalogue
+    </a>
+
+    <a
+      href="#"
+      onclick="show('sell');return false"
+    >
+      Devenir vendeur
+    </a>
+
+    <a
+      href="#"
+      onclick="show('dashboard');return false"
+    >
+      Espace vendeur
+    </a>
+
   </nav>
-  <button class="cart" onclick="show('cart')">Panier <b id="cartCount">0</b></button>
+
+  <button
+    class="cart"
+    onclick="show('cart')"
+  >
+    Panier
+    <b id="cartCount">0</b>
+  </button>
+
 </header>
+
+
 <main id="app"></main>
-<footer>AUTOLOOP — MVP 0.4 · Prototype local</footer>
-<script src="app.js"></script>
+
+
+<footer>
+  AUTOLOOP — MVP 0.5 · Prototype local
+</footer>
+
+
+<script src="app.js?v=0.5"></script>
+
 </body>
 </html>
